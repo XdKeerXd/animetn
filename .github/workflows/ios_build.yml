@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
       
@@ -20,7 +20,12 @@ jobs:
         run: flutter pub get
         
       - name: Build iOS
-        run: flutter build ios --release --no-codesign
+        run: |
+          cd ios
+          # Ensure CocoaPods is ready
+          pod repo update
+          cd ..
+          flutter build ios --release --no-codesign
         
       - name: Create IPA
         run: |
