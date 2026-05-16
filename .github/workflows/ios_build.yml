@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-13
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       
@@ -17,18 +17,25 @@ jobs:
           channel: 'stable'
           
       - name: Install dependencies
+        run: flutter pub get
+
+      - name: Setup env File
+        env:
+          SIMKL_CLIENT_SECRET: ${{ secrets.SIMKL_CLIENT_SECRET }}
+          SIMKL_CLIENT_ID: ${{ secrets.SIMKL_CLIENT_ID }}
+        shell: bash
         run: |
-          flutter pub get
-          
+          echo "SIMKL_CLIENT_SECRET=$SIMKL_CLIENT_SECRET" > .env
+          echo "SIMKL_CLIENT_ID=$SIMKL_CLIENT_ID" >> .env
+
       - name: Build iOS
-        run: |
-          flutter build ios --release --no-codesign
+        run: flutter build ios --release --no-codesign --dart-define-from-file=.env
         
       - name: Create IPA
         run: |
           mkdir -p Payload
-          mv build/ios/iphoneos/Runner.app Payload/
-          zip -r animetn.ipa Payload
+          cp -r build/ios/iphoneos/Runner.app Payload/
+          zip -vr animetn.ipa Payload
           
       - name: Upload IPA
         uses: actions/upload-artifact@v4
