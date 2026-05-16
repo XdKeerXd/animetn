@@ -141,20 +141,14 @@ class _AnimeCardState extends State<AnimeCard> {
                               : width,
                       margin: EdgeInsets.only(bottom: 10, top: widget.isMobile ? 0 : 5),
                       decoration: BoxDecoration(
-                        border: widget.isMobile || Platform.isWindows || Platform.isLinux
-                            ? null
-                            : isFocused
-                                ? Border.all(
-                                    color: appTheme.accentColor,
-                                    strokeAlign: BorderSide.strokeAlignOutside,
-                                    width: 2,
-                                  )
-                                : null,
-                        borderRadius: BorderRadius.circular(widget.isMobile
-                            ? 20
-                            : isFocused
-                                ? 5
-                                : 10),
+                        border: isFocused
+                            ? Border.all(
+                                color: appTheme.accentColor,
+                                strokeAlign: BorderSide.strokeAlignOutside,
+                                width: 2,
+                              )
+                            : null,
+                        borderRadius: BorderRadius.circular(isFocused ? 5 : 10),
                       ),
                       clipBehavior: Clip.hardEdge,
                       child: Stack(

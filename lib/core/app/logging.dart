@@ -64,6 +64,10 @@ class Logbook {
 
   /// Writes the current log buffer to disk and flushes the buffer
   Future<void> writeLog() async {
+    if (kIsWeb) {
+      _logBuffer.clear();
+      return;
+    }
     try {
       //write the log to Documents folder
       final docs = await getApplicationDocumentsDirectory();

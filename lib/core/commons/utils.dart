@@ -82,15 +82,18 @@ MediaStatus? assignItemEnum(String? valueInString) {
   }
 }
 
+import 'package:flutter/foundation.dart';
+
 Future<bool> isTv() async {
-  if (!Platform.isAndroid) return false;
+  if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return false;
   AndroidDeviceInfo androidInfo = await DeviceInfoPlugin().androidInfo;
   return androidInfo.systemFeatures.contains('android.software.leanback');
 }
 
 Future<Directory> getDocumentsDirectory() async {
+  if (kIsWeb) throw UnsupportedError("Cannot access file system on Web");
   final Directory dir = await getApplicationDocumentsDirectory();
-  if (Platform.isAndroid) {
+  if (defaultTargetPlatform == TargetPlatform.android) {
     bool status = await Permission.manageExternalStorage.isGranted;
     if (!status) {
       final req = await Permission.manageExternalStorage.request();

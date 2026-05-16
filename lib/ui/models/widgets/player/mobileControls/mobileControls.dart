@@ -45,10 +45,23 @@ class _MobileControlsState extends State<MobileControls> {
 
   void _keyListenerEvent(KeyEvent event) {
     if (event is KeyUpEvent) return;
-    print("Key pressed: ${event.logicalKey.keyLabel}");
-    print(event);
+    
+    // Auto show controls on any key press
+    if (!provider.state.controlsVisible) {
+      provider.toggleControlsVisibility(action: true);
+    }
+
     switch (event.logicalKey) {
       case LogicalKeyboardKey.mediaPlayPause:
+      case LogicalKeyboardKey.select:
+      case LogicalKeyboardKey.enter:
+      case LogicalKeyboardKey.space:
+        if (provider.state.playerState == PlayerState.playing) {
+          provider.controller.pause();
+        } else {
+          provider.controller.play();
+        }
+        break;
       case LogicalKeyboardKey.mediaPause:
         provider.controller.pause();
         break;
@@ -67,30 +80,29 @@ class _MobileControlsState extends State<MobileControls> {
                 index: dataProvider.state.currentEpIndex - 1, dataProvider: dataProvider, playerProvider: provider));
         break;
       case LogicalKeyboardKey.mediaFastForward:
+      case LogicalKeyboardKey.arrowRight:
         provider.fastForward(skipDuration ?? 10);
         break;
       case LogicalKeyboardKey.mediaRewind:
+      case LogicalKeyboardKey.arrowLeft:
         provider.fastForward(-(skipDuration ?? 10));
         break;
-      case LogicalKeyboardKey.select:
-        {
-          if (!provider.state.controlsVisible) {
-            provider.toggleControlsVisibility();
-          }
-          break;
-        }
       case LogicalKeyboardKey.arrowUp:
+        // Volume up could go here, or just show controls
+        break;
       case LogicalKeyboardKey.arrowDown:
-      case LogicalKeyboardKey.arrowLeft:
-      case LogicalKeyboardKey.arrowRight:
-        {
-          if (!provider.state.controlsVisible) {
-            provider.toggleControlsVisibility();
-          }
+        // Volume down could go here, or just show controls
+        break;
+      case LogicalKeyboardKey.escape:
+      case LogicalKeyboardKey.backspace:
+        if (provider.state.controlsVisible) {
+          provider.toggleControlsVisibility(action: false);
+        } else {
+          Navigator.pop(context);
         }
-
+        break;
       default:
-        print("Unhandled key: ${event.logicalKey.keyLabel} (${event.logicalKey.keyId}) type: ${event.deviceType.name}");
+        print("Unhandled key: ${event.logicalKey.keyLabel}");
     }
   }
 

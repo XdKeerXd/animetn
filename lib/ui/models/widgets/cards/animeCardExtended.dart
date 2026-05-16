@@ -46,6 +46,13 @@ class AnimeCardExtended extends StatefulWidget {
 
 class _AnimeCardExtendedState extends State<AnimeCardExtended> {
   bool isPressed = false;
+  bool isFocused = false;
+
+  void updateFocus(bool val) {
+    setState(() {
+      isFocused = val;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,12 +64,20 @@ class _AnimeCardExtendedState extends State<AnimeCardExtended> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         color: appTheme.backgroundColor,
+        border: isFocused
+            ? Border.all(
+                color: appTheme.accentColor,
+                width: 2,
+              )
+            : null,
       ),
       clipBehavior: Clip.hardEdge,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          focusColor: appTheme.textSubColor,
+          focusColor: Colors.transparent,
+          onHover: updateFocus,
+          onFocusChange: updateFocus,
           onHighlightChanged: (val) {
             setState(() {
               isPressed = val;

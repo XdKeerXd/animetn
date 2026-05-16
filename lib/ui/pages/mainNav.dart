@@ -30,7 +30,15 @@ class MainNavigatorState extends State<MainNavigator> with TickerProviderStateMi
 
     final provider = context.read<MainNavProvider>();
 
-    isTv().then((value) => provider.tv = value);
+    isTv().then((value) {
+      provider.tv = value;
+      if (value) {
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.landscapeLeft,
+          DeviceOrientation.landscapeRight,
+        ]);
+      }
+    });
 
     // open the box for the whole app life time!
     DownloadHistory.initBox();
@@ -132,7 +140,7 @@ class MainNavigatorState extends State<MainNavigator> with TickerProviderStateMi
         popTimeoutWindow();
       },
       child: Scaffold(
-        body: MediaQuery.of(context).orientation == Orientation.landscape || Platform.isWindows || Platform.isLinux
+        body: MediaQuery.of(context).orientation == Orientation.landscape || (!kIsWeb && (defaultTargetPlatform == TargetPlatform.windows || defaultTargetPlatform == TargetPlatform.linux))
             ? Row(
                 children: [
                   // AnimetnNavRail(
@@ -154,6 +162,9 @@ class MainNavigatorState extends State<MainNavigator> with TickerProviderStateMi
                     elevation: 1,
                     indicatorShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     indicatorColor: appTheme.accentColor,
+                    unselectedIconTheme: IconThemeData(color: appTheme.textSubColor),
+                    selectedIconTheme: IconThemeData(color: appTheme.onAccent),
+                    minWidth: 72,
                     destinations: [
                       NavigationRailDestination(
                         icon: Icon(

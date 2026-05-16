@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 
 import 'package:animetn/core/app/logging.dart';
 import 'package:animetn/core/app/runtimeDatas.dart';
@@ -17,7 +18,7 @@ import 'package:flutter/widgets.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class MainNavProvider extends ChangeNotifier {
-  bool _isAndroid = Platform.isAndroid;
+  bool _isAndroid = !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
   bool get isAndroid => _isAndroid;
 
   bool _tv = false;
@@ -184,6 +185,7 @@ class MainNavProvider extends ChangeNotifier {
 
   /// Checks if the device is connected to internet
   Future<bool> isConnectedToInternet() async {
+    if (kIsWeb) return true; // Browser handles connection
     try {
       final result = await InternetAddress.lookup('google.com');
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
@@ -191,6 +193,8 @@ class MainNavProvider extends ChangeNotifier {
       }
       return false;
     } on SocketException catch (_) {
+      return false;
+    } catch (_) {
       return false;
     }
   }

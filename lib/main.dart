@@ -43,7 +43,7 @@ class _HttpOverrides extends HttpOverrides {
 
 void main(List<String> args) async {
   try {
-    if (runWebViewTitleBarWidget(args)) {
+    if (!kIsWeb && runWebViewTitleBarWidget(args)) {
       return;
     }
 
@@ -52,13 +52,15 @@ void main(List<String> args) async {
     // Initialise app version instance
     AppVersion.init();
 
-    await Hive.initFlutter(!Platform.isAndroid ? "animetn" : null);
+    await Hive.initFlutter((!kIsWeb && defaultTargetPlatform != TargetPlatform.android) ? "animetn" : null);
 
     await loadAndAssignSettings();
 
-    fvp.registerWith(options: { 'platforms': ['linux', 'windows' ]});
+    if (!kIsWeb) {
+      fvp.registerWith(options: { 'platforms': ['linux', 'windows' ]});
+    }
 
-    if (Platform.isWindows || Platform.isLinux) {
+    if (!kIsWeb && (defaultTargetPlatform == TargetPlatform.windows || defaultTargetPlatform == TargetPlatform.linux)) {
       await windowManager.ensureInitialized();
       await windowManager.setTitleBarStyle(TitleBarStyle.hidden, windowButtonVisibility: false);
 
@@ -79,7 +81,9 @@ void main(List<String> args) async {
       ..addSources(sm.inbuiltSources)
       ..loadProviders(clearBeforeLoading: false);
 
-    HttpOverrides.global = _HttpOverrides();
+    if (!kIsWeb) {
+      HttpOverrides.global = _HttpOverrides();
+    }
 
     // await dotenv.load(fileName: ".env");
 
@@ -323,7 +327,7 @@ class _AnimetnState extends State<Animetn> {
                 iconTheme: IconThemeData(color: appTheme.textMainColor)),
             home: ChangeNotifierProvider(
               create: (context) => MainNavProvider(),
-              child: Platform.isWindows || Platform.isLinux ? AppWrapper(firstPage: MainNavigator()) : MainNavigator(),
+              child: (!kIsWeb && (defaultTargetPlatform == TargetPlatform.windows || defaultTargetPlatform == TargetPlatform.linux)) ? AppWrapper(firstPage: MainNavigator()) : MainNavigator(),
             ),
             debugShowCheckedModeBanner: false,
           );
