@@ -25,8 +25,17 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Setup env File
+        env:
+          SIMKL_CLIENT_SECRET: ${{ secrets.SIMKL_CLIENT_SECRET }}
+          SIMKL_CLIENT_ID: ${{ secrets.SIMKL_CLIENT_ID }}
+        shell: bash
+        run: |
+          echo "SIMKL_CLIENT_SECRET=$SIMKL_CLIENT_SECRET" > .env
+          echo "SIMKL_CLIENT_ID=$SIMKL_CLIENT_ID" >> .env
+
       - name: Build Web
-        run: flutter build web --release --base-href /${{ github.event.repository.name }}/
+        run: flutter build web --release --base-href /${{ github.event.repository.name }}/ --dart-define-from-file=.env
 
       - name: Create 404.html
         run: cp build/web/index.html build/web/404.html
